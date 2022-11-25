@@ -14,5 +14,7 @@ for sample in samples:
             if sample[0:4] == 'DBT_':
                 sample_new1 = sample.split('_')[1] + '_' + sample.split('_')[2]
                 sample_new2 = sample_new1.replace('-', '_')
+                #try:
                 os.rename(os.path.join(root), os.path.join(root, sample_new2))
-                #os.rename(directory, sample_new2)
+                #except Exception:
+                #    print('nö')

@@ -3,14 +3,16 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from cleanup import cleanup
 
 # experiment needs to be the name of the folder containing all sample folders
-experiment = '20220921'
-testes_substrate = 'TCP'
+experiment = '20220919'
+testes_substrate = 'TBP'
+equilibrium = 0.5
 
 if testes_substrate == 'TBP':
     ion_types = {250: 'DD1', 251: 'DD1', 252: 'DD2', 253: 'DD2'}
-    linenums = [i for i in range(21, 33)]
+    linenums = [i for i in range(21, 33)]       #linenums represents the rows in the text file with related data
 if testes_substrate == 'TCP':
     ion_types = {162: 'DD1', 163: 'DD1', 164: 'DD2', 165: 'DD2'}
     linenums = [i for i in range(21, 29)]
@@ -56,7 +58,6 @@ for sample in samples:
 # add the ionpair assignment to dataframe
 results['ion_type'] = results.apply(lambda row: ion_types[row['ion']], axis=1)
 
-
 # adjust the timepoints to [min] as unit in dataframe
 for i in results.index:
     time = results.loc[i, 'timepoint_[min]']
@@ -69,25 +70,26 @@ for i in results.index:
         newtime = ("%.2f" % newtime)                # keep only 2 digits after dot
     results.loc[i, 'timepoint_[min]'] = float(newtime)
 
-calc = results.groupby(['Mastermix_with', 'timepoint_[min]', 'RT', 'ion_type']).quotient.agg('mean')
-calc = calc.reset_index()
-NCC = calc[(calc['timepoint_[min]'] == 'NCC')].index
-calc.drop(NCC, inplace=True)
-NSC = calc[(calc['timepoint_[min]'] == 'NSC')].index
-calc.drop(NSC, inplace=True)
-calc.sort_values(by=['timepoint_[min]'])
+print(results)
 
-# selects all data of calculated DD1 and DD2
-calc_DD1 = calc.loc[calc['ion_type'] == 'DD1']
-calc_DD2 = calc.loc[calc['ion_type'] == 'DD2']
+#calc df contains data for fiure 1, 2 and 3
+#calc2 df contains data for figure 4
+calc = results.groupby(['Mastermix_with', 'timepoint_[min]', 'RT', 'ion_type']).agg({'quotient': ['mean', 'std', 'count']})
+calc2 = results.groupby(['Mastermix_with', 'timepoint_[min]', 'ion_type']).agg({'quotient': ['mean', 'std', 'count']})
+
+# selects all data of calculated DD1 and DD2 from cleaned df for figure 1, 2 and 3
+# select all data of calculated DD1 and DD2 from cleaned df for figure 4
+calc_DD1 = cleanup(calc).loc[cleanup(calc)['ion_type'] == 'DD1']
+calc_DD2 = cleanup(calc).loc[cleanup(calc)['ion_type'] == 'DD2']
+calc_MW = cleanup(calc2)
 
 condition = pd.unique(results['Mastermix_with'])
 RTs = pd.unique(results['RT'])
 RTs = list(map(int, RTs))
 
 # for every MM approach
-# figure 1, 2, 3: DD1, DD2 at RT1, RT2, RT3
-# figure 4: DD1 and DD2 for average of all RT's
+# figure 1, 2, 3: DD1 and DD2 at RT1, RT2, RT3
+# figure 4: DD1 and DD2 average of all RT's
 for MM in condition:
     for x in RTs:
         calc_DD1_RT = calc_DD1.loc[(calc_DD1['RT'] == str(x)) & (calc_DD1['Mastermix_with'] == MM)]
@@ -95,38 +97,56 @@ for MM in condition:
 
         x1 = list(calc_DD1_RT.iloc[:, 1])
         y1 = list(calc_DD1_RT.iloc[:, 4])
+        y1_err = list(calc_DD1_RT.iloc[:, 5])
         x2 = list(calc_DD2_RT.iloc[:, 1])
         y2 = list(calc_DD2_RT.iloc[:, 4])
+        y2_err = list(calc_DD2_RT.iloc[:, 5])
+        x3 = [*range(0, 61, 1)]
+        y3 = [equilibrium] * 61
 
-        plt.plot(x1, y1, label='DD1')
-        plt.plot(x2, y2, label='DD2')
-        plt.title('DD1, DD2 at RT ' + str(x) + ' Mastermix w: ' + MM + ', ' + experiment + ', ' + testes_substrate)
+        plt.errorbar(x1, y1, yerr=y1_err, marker='s', alpha=0.7, capsize=10, label='DD1')
+        plt.errorbar(x2, y2, yerr=y2_err, marker='s', alpha=0.7, capsize=10, label='DD2')
+        plt.plot(x3, y3, label='Equilibrium')
+        plt.title(experiment + '\n' + 'DD1, DD2 at RT ' + str(x) + '\n' + ' Mastermix w: ' + MM + ', ' + testes_substrate)
         plt.xlabel('time [min]')
         plt.ylabel('Deuterium Degree')
         plt.legend(loc="upper right")
+        plt.tight_layout()
         plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(x)) + MM)
         plt.show()
 
     #figure 4: AVG(DD1, DD2)
-    calc_MW = calc.groupby(['Mastermix_with', 'timepoint_[min]', 'ion_type']).quotient.agg('mean')
-    calc_MW = calc_MW.reset_index()
-
     calc_MW_DD1 = calc_MW.loc[(calc_MW['ion_type'] == 'DD1') & (calc_MW['Mastermix_with'] == MM)]
     calc_MW_DD2 = calc_MW.loc[(calc_MW['ion_type'] == 'DD2') & (calc_MW['Mastermix_with'] == MM)]
 
     x1 = list(calc_MW_DD1.iloc[:, 1])
     y1 = list(calc_MW_DD1.iloc[:, 3])
+    y1_err = list(calc_MW_DD1.iloc[:, 4])
     x2 = list(calc_MW_DD2.iloc[:, 1])
     y2 = list(calc_MW_DD2.iloc[:, 3])
+    y2_err = list(calc_MW_DD2.iloc[:, 4])
+    x3 = [*range(0, 61, 1)]
+    y3 = [equilibrium] * 61
 
-    plt.plot(x1, y1, label='DD1')
-    plt.plot(x2, y2, label='DD2')
-    plt.title('DD1, DD2 all RTs ' + ' Mastermix w: ' + MM + ', ' + experiment + ', ' + testes_substrate)
+    plt.errorbar(x1, y1, y1_err, marker='s', alpha=0.7, capsize=10, label='DD1')
+    plt.errorbar(x2, y2, y2_err,marker='s', alpha=0.7, capsize=10,  label='DD2')
+    plt.plot(x3, y3, label='Equilibrium')
+    plt.title(experiment + '\n' + 'DD1, DD2 all RTs ' + '\n' + ' Mastermix w: ' + MM + ', ' + testes_substrate)
     plt.xlabel('time [min]')
     plt.ylabel('Deuterium Degree')
     plt.legend(loc="upper right")
+    plt.tight_layout()
     plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'MW' + MM))
     plt.show()
+
+
+def calc_mean_std(x):
+    d = {}
+    d['new_mean'] = (x['quotient']['mean'] * x['quotient']['count']).sum() / x['quotient']['count'].sum()
+    d['new_std'] = ((x['quotient']['mean'] * x['quotient']['count']).sum() / x['quotient']['count'].sum()).std()
+    return pd.Series(d, index=['new_mean', 'new_std'])
+
+
 
 
 
