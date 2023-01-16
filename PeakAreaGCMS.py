@@ -5,7 +5,7 @@ import os
 import matplotlib.pyplot as plt
 
 # experiment needs to be the name of the folder containing all sample folders
-experiment = '20221102_2'
+experiment = '20221102_2_Peakarea_Auswertung_2'
 linenums = [20]
 directory = os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment)
 

@@ -157,25 +157,31 @@ for MM in condition:
 
         # hide the spines between ax and ax2
         ax.spines['right'].set_visible(False)
+        ax2.spines['right'].set_visible(False)
         ax2.spines['left'].set_visible(False)
+        ax.spines['top'].set_visible(False)
         ax2.spines['top'].set_visible(False)
+        ax2.yaxis.set_visible(False)
         ax.yaxis.tick_left()
         ax.tick_params(axis='y', color='b')
-        ax2.tick_params(labelright='off')
-        ax2.tick_params(axis='y', color='w')
+        # ax2.tick_params(labelright='off')
+        # ax2.tick_params(axis='y', color='w')
 
-        ax.set_xlim(0, 5.5)
-        ax2.set_xlim(8, 52)
+        ax.set_xlim(0, 13)
+        ax2.set_xlim(13, 62)
+
+        ax.set_ylim(0, 0.8)
+        ax2.set_ylim(0, 0.8)
 
         d = 0.01  # how big to make the diagonal lines in axes coordinates
         # arguments to pass plot, just so we don't keep repeating them
         kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
-        ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)
-        ax.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
+        ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)         #bottom left
+        #ax.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)    #top left
 
         kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
-        ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)
-        ax2.plot((-d, +d), (-d, +d), **kwargs)
+        #ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)        # top right
+        ax2.plot((-d, +d), (-d, +d), **kwargs)              # bottom right
 
         # Set common labels for the figure
         f.suptitle(experiment + '\n' + 'DD1, DD2 at RT ' + str(x) + '\n' + ' Mastermix w: ' + MM + ', ' + testes_substrate)
@@ -222,14 +228,18 @@ for MM in condition:
 
     # hide the spines between ax and ax2
     ax.spines['right'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
     ax2.spines['left'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax2.spines['top'].set_visible(False)
+    ax2.yaxis.set_visible(False)
     ax.yaxis.tick_left()
     ax.tick_params(axis='y', color='b')
-    ax2.tick_params(labelright='off')
-    ax2.tick_params(axis='y', color='w')
+    #ax2.tick_params(labelright='off')
+    #ax2.tick_params(axis='y', color='w')
 
-    ax.set_xlim(0, 5.5)
-    ax2.set_xlim(8, 52)
+    ax.set_xlim(0, 12)
+    ax2.set_xlim(13, 62)
 
     d = 0.01  # how big to make the diagonal lines in axes coordinates
     # arguments to pass plot, just so we don't keep repeating them
