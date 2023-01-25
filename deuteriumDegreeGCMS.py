@@ -4,6 +4,8 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from cleanup import cleanup
+from plot_figure import plot_figures
+
 
 #TODO delete RT2 (11.1 min) in approaches with TBP substrate -> unsure what sis is
 #TODO: set up function for plotting
@@ -129,71 +131,13 @@ for MM in condition:
         calc_DD1_RT = calc_DD1.loc[(calc_DD1['RT'] == str(x)) & (calc_DD1['Mastermix_with'] == MM)]
         calc_DD2_RT = calc_DD2.loc[(calc_DD2['RT'] == str(x)) & (calc_DD2['Mastermix_with'] == MM)]
 
-        num_rows = calc_DD1_RT.shape[0]
+        plot_figure(calc_DD1_RT, calc_DD2_RT, equ_MMw_H2O, equ_MMw_D2O, x, testes_substrate)
 
-        x1 = list(calc_DD1_RT.iloc[:, 1])
-        y1 = list(calc_DD1_RT.iloc[:, 4])
-        y1_err = list(calc_DD1_RT.iloc[:, 5])
-        x2 = list(calc_DD2_RT.iloc[:, 1])
-        y2 = list(calc_DD2_RT.iloc[:, 4])
-        y2_err = list(calc_DD2_RT.iloc[:, 5])
-        x3 = list(calc_DD1_RT.iloc[:, 1])
-
-        if MM == "D2O":
-            equilibrium = equ_MMw_D2O
-        elif MM == "H2O":
-            equilibrium = equ_MMw_H2O
-
-        y3 = [equilibrium] * num_rows
-
-        f, (ax, ax2) = plt.subplots(1, 2, sharey=True, facecolor='w', gridspec_kw={'width_ratios': [4, 1]})
-
-        # plot the same data on both axes
-        ax.errorbar(x1, y1, yerr=y1_err, marker='s', alpha=0.7, capsize=3, label='DD1')
-        ax2.errorbar(x1, y1, yerr=y1_err, marker='s', alpha=0.7, capsize=3, label='DD1')
-
-        ax.errorbar(x2, y2, yerr=y2_err, marker='s', alpha=0.7, capsize=3, label='DD2')
-        ax2.errorbar(x2, y2, yerr=y2_err, marker='s', alpha=0.7, capsize=3, label='DD2')
-
-        ax.plot(x1, y3, label='Equilibrium', color= 'grey')
-        ax2.plot(x1, y3, label='Equilibrium', color= 'grey')
-
-        # hide the spines between ax and ax2
-        ax.spines['right'].set_visible(False)
-        ax2.spines['right'].set_visible(False)
-        ax2.spines['left'].set_visible(False)
-        ax.spines['top'].set_visible(False)
-        ax2.spines['top'].set_visible(False)
-        ax2.yaxis.set_visible(False)
-        ax.yaxis.tick_left()
-        ax.tick_params(axis='y', color='b')
-
-        ax.set_xlim(0, 8.5)
-        ax2.set_xlim(8.5, 62)
-
-        #ax.set_ylim(0, 0.8)
-        #ax2.set_ylim(0, 0.8)
-
-        d = 0.01  # how big to make the diagonal lines in axes coordinates
-        # arguments to pass plot, just so we don't keep repeating them
-        kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
-        ax.plot((0.995, 1.005), (-d, +d), **kwargs)         #bottom left
-
-        kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
-        ax2.plot((-0.02, 0.02), (-d, +d), **kwargs)         #bottom right
-
-        # Set common labels for the figure
-        f.suptitle(experiment + '\n' + 'DD1, DD2 at RT ' + str(x) + '\n' + ' Mastermix w: ' + MM + ', ' + testes_substrate)
-        f.text(0.5, 0.04, 'Time [min]', ha='center', va='center')
-        f.text(0.06, 0.5, 'Deuterium Degree', ha='center', va='center', rotation='vertical')
-        f.subplots_adjust(wspace=0.025)
-
-        ax.legend(loc="upper left")
-        pltname = str(experiment + str(x) + MM)
         #plt.savefig(pltname + '.svg')
         plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(x)) + MM)
 
         plt.show()
+
 
     #figure 4: AVG(DD1, DD2)
     calc_MW_DD1 = calc_MW.loc[(calc_MW['ion_type'] == 'DD1') & (calc_MW['Mastermix_with'] == MM)]
