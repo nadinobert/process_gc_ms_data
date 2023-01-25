@@ -40,9 +40,9 @@ plt.rcParams["font.family"] = "Times New Roman"
 # experiment needs to be the name of the folder containing all sample folders
 # experiments with DD calc for puplication: 20221102 20220919 20220308_practical_course_DBT
 
-experiment = '20220919_TBP_Auswertung_4'
+experiment = '20230124_2_TBP_Auswertung_5'
 testes_substrate = 'TBP'
-equ_MMw_H2O = 0.5
+equ_MMw_H2O = 0.2
 equ_MMw_D2O = 0.791
 
 if testes_substrate == 'TBP':
@@ -134,9 +134,9 @@ for MM in condition:
         x1 = list(calc_DD1_RT.iloc[:, 1])
         y1 = list(calc_DD1_RT.iloc[:, 4])
         y1_err = list(calc_DD1_RT.iloc[:, 5])
-        #x2 = list(calc_DD2_RT.iloc[:, 1])
-        #y2 = list(calc_DD2_RT.iloc[:, 4])
-        #y2_err = list(calc_DD2_RT.iloc[:, 5])
+        x2 = list(calc_DD2_RT.iloc[:, 1])
+        y2 = list(calc_DD2_RT.iloc[:, 4])
+        y2_err = list(calc_DD2_RT.iloc[:, 5])
         x3 = list(calc_DD1_RT.iloc[:, 1])
 
         if MM == "D2O":
@@ -152,8 +152,12 @@ for MM in condition:
         ax.errorbar(x1, y1, yerr=y1_err, marker='s', alpha=0.7, capsize=3, label='DD1')
         ax2.errorbar(x1, y1, yerr=y1_err, marker='s', alpha=0.7, capsize=3, label='DD1')
 
-        ax.plot(x1, y3, label='Equilibrium')
-        ax2.plot(x1, y3, label='Equilibrium')
+        ax.errorbar(x2, y2, yerr=y2_err, marker='s', alpha=0.7, capsize=3, label='DD2')
+        ax2.errorbar(x2, y2, yerr=y2_err, marker='s', alpha=0.7, capsize=3, label='DD2')
+
+
+        ax.plot(x1, y3, label='Equilibrium', color= 'grey')
+        ax2.plot(x1, y3, label='Equilibrium', color= 'grey')
 
         # hide the spines between ax and ax2
         ax.spines['right'].set_visible(False)
@@ -164,35 +168,32 @@ for MM in condition:
         ax2.yaxis.set_visible(False)
         ax.yaxis.tick_left()
         ax.tick_params(axis='y', color='b')
-        # ax2.tick_params(labelright='off')
-        # ax2.tick_params(axis='y', color='w')
 
-        ax.set_xlim(0, 13)
-        ax2.set_xlim(13, 62)
+        ax.set_xlim(0, 8.5)
+        ax2.set_xlim(8.5, 62)
 
-        ax.set_ylim(0, 0.8)
-        ax2.set_ylim(0, 0.8)
+        #ax.set_ylim(0, 0.8)
+        #ax2.set_ylim(0, 0.8)
 
         d = 0.01  # how big to make the diagonal lines in axes coordinates
         # arguments to pass plot, just so we don't keep repeating them
         kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
-        ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)         #bottom left
-        #ax.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)    #top left
+        ax.plot((0.995, 1.005), (-d, +d), **kwargs)         #bottom left
 
         kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
-        #ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)        # top right
-        ax2.plot((-d, +d), (-d, +d), **kwargs)              # bottom right
+        ax2.plot((-0.02, 0.02), (-d, +d), **kwargs)         #bottom right
 
         # Set common labels for the figure
         f.suptitle(experiment + '\n' + 'DD1, DD2 at RT ' + str(x) + '\n' + ' Mastermix w: ' + MM + ', ' + testes_substrate)
         f.text(0.5, 0.04, 'Time [min]', ha='center', va='center')
         f.text(0.06, 0.5, 'Deuterium Degree', ha='center', va='center', rotation='vertical')
+        f.subplots_adjust(wspace=0.025)
 
         ax.legend(loc="upper left")
         #f.tight_layout()
         pltname = str(experiment + str(x) + MM)
         #plt.savefig(pltname + '.svg')
-        #plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'MW' + MM ))
+        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(x)) + MM)
 
         plt.show()
 
@@ -205,9 +206,9 @@ for MM in condition:
     x1 = list(calc_MW_DD1.iloc[:, 1])
     y1 = list(calc_MW_DD1.iloc[:, 3])
     y1_err = list(calc_MW_DD1.iloc[:, 4])
-    #x2 = list(calc_MW_DD2.iloc[:, 1])
-    #y2 = list(calc_MW_DD2.iloc[:, 3])
-    #y2_err = list(calc_MW_DD2.iloc[:, 4])
+    x2 = list(calc_MW_DD2.iloc[:, 1])
+    y2 = list(calc_MW_DD2.iloc[:, 3])
+    y2_err = list(calc_MW_DD2.iloc[:, 4])
     x3 = list(calc_MW_DD1.iloc[:, 1])
 
     if MM == "D2O":
@@ -235,8 +236,6 @@ for MM in condition:
     ax2.yaxis.set_visible(False)
     ax.yaxis.tick_left()
     ax.tick_params(axis='y', color='b')
-    #ax2.tick_params(labelright='off')
-    #ax2.tick_params(axis='y', color='w')
 
     ax.set_xlim(0, 12)
     ax2.set_xlim(13, 62)
@@ -255,12 +254,11 @@ for MM in condition:
     f.suptitle((experiment + '\n' + 'DD1, DD2 all RTs ' + '\n' + ' Mastermix w: ' + MM + ', ' + testes_substrate))
     f.text(0.5, 0.04, 'Time [min]', ha='center', va='center')
     f.text(0.06, 0.5, 'Deuterium Degree', ha='center', va='center', rotation='vertical')
-
     ax.legend(loc="upper left")
     # f.tight_layout()
     #pltname = str(experiment + str(x) + MM)
     # plt.savefig(pltname + '.svg')
-    # plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'MW' + MM ))
+    plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'MW' + MM ))
 
     plt.show()
 
