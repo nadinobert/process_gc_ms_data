@@ -155,7 +155,6 @@ for MM in condition:
         ax.errorbar(x2, y2, yerr=y2_err, marker='s', alpha=0.7, capsize=3, label='DD2')
         ax2.errorbar(x2, y2, yerr=y2_err, marker='s', alpha=0.7, capsize=3, label='DD2')
 
-
         ax.plot(x1, y3, label='Equilibrium', color= 'grey')
         ax2.plot(x1, y3, label='Equilibrium', color= 'grey')
 
@@ -190,7 +189,6 @@ for MM in condition:
         f.subplots_adjust(wspace=0.025)
 
         ax.legend(loc="upper left")
-        #f.tight_layout()
         pltname = str(experiment + str(x) + MM)
         #plt.savefig(pltname + '.svg')
         plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(x)) + MM)
