@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
 
-def figure_zoom(DD1, DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, Num_RT, tested_substrate):
+def figure_simple(DD1, DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, Num_RT, tested_substrate):
 
     num_rows = DD1.shape[0]
 
@@ -37,18 +37,6 @@ def figure_zoom(DD1, DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, Num_RT, test
     ax.set_ylim(0, 1)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
-
-    # create inset axes
-    #axins = inset_axes(ax, width='30%', height='30%', loc='lower right')
-    axins = ax.inset_axes([0.65, 0.1, 0.3, 0.3])         #first two numbers give the position in the plot, the second two numbers give the size
-    axins.errorbar(x1, y1, yerr=y1_err, marker='s', alpha=0.7, capsize=3)
-    axins.set_xlim(-0.2, 2.5)     # location of subpart of the plot that should be zoomed in
-    axins.set_ylim(0.15, 0.35)        # location of subpart of the plot that should be zoomed in
-    # axins.scatter([2, 3], [4, 9], color='red', s=200)
-
-    # mark the zoomed region
-    mark_inset(ax, axins, loc1=2, loc2=3, fc="none", ec="0.5")
-
 
     # Set common labels for the figure
     fig.suptitle(

@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 
-def figure_broken(DD1, DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, Num_RT, tested_substrate):
+def figure_break(DD1, DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, Num_RT, tested_substrate):
 
     num_rows = DD1.shape[0]
 

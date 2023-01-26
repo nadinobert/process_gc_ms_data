@@ -4,7 +4,9 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from cleanup import cleanup
-from plot_figure import figure_broken
+from plot_figure import figure_break
+from plot_zoom import figure_zoom
+from plot_simple import figure_simple
 
 
 #TODO delete RT2 (11.1 min) in approaches with TBP substrate -> unsure what sis is
@@ -42,9 +44,9 @@ plt.rcParams["font.family"] = "Times New Roman"
 # experiment needs to be the name of the folder containing all sample folders
 # experiments with DD calc for puplication: 20221102 20220919 20220308_practical_course_DBT
 
-experiment = '20220309'
+experiment = '20220301_TBP_Auswertung_4'
 global tested_substrate
-tested_substrate = 'TeCB'
+tested_substrate = 'TBP'
 equ_MMw_H2O = 0.16
 equ_MMw_D2O = 0.791
 
@@ -132,16 +134,19 @@ for MM in condition:
         calc_DD1_RT = calc_DD1.loc[(calc_DD1['RT'] == str(Num_RT)) & (calc_DD1['Mastermix_with'] == MM)]
         calc_DD2_RT = calc_DD2.loc[(calc_DD2['RT'] == str(Num_RT)) & (calc_DD2['Mastermix_with'] == MM)]
 
-        figure_broken(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
+        figure_zoom(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
         #plt.savefig(pltname + '.svg')
-        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(Num_RT)) + MM)
+        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(Num_RT)) + MM + 'zoom')
+        figure_break(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
+        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment,
+                                 str(Num_RT)) + MM + 'break')
         plt.show()
 
     #figure 4: AVG(DD1, DD2)
     calc_MW_DD1 = calc_MW.loc[(calc_MW['ion_type'] == 'DD1') & (calc_MW['Mastermix_with'] == MM)]
     calc_MW_DD2 = calc_MW.loc[(calc_MW['ion_type'] == 'DD2') & (calc_MW['Mastermix_with'] == MM)]
 
-    figure_broken(calc_MW_DD1, calc_MW_DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, 'all RTs', tested_substrate)
+    figure_break(calc_MW_DD1, calc_MW_DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, 'all RTs', tested_substrate)
     # plt.savefig(pltname + '.svg')
     plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'MW' + MM ))
     plt.show()
