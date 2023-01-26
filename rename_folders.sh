@@ -12,5 +12,5 @@ fi
 # replace the last character of folder name -> replace 3 by 6
 #find . -mindepth 1 -maxdepth 2 -type d -name '*3.D' -exec bash -c 'd="{}";e=${d%3}6;'"${testingOrRunning}"' mv "$d" "$e"' \;
 
-# replace the first character of folder name -> replace E by D2O
-find . -mindepth 1 -maxdepth 2 -type d -name 'E*' -exec bash -c 'd="{}";e=${d:0:2}"D2O"${d:3};'"${testingOrRunning}"' mv "$d" "$e"' \;
+# replace the first character of folder name -> replace 'E*' by "D2O_"
+find . -mindepth 1 -maxdepth 2 -type d -name 'H*' -exec bash -c 'd="{}";e=${d:0:2}"D"${d:3};'"${testingOrRunning}"' mv "$d" "$e"' \;

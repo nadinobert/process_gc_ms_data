@@ -4,7 +4,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from cleanup import cleanup
-from plot_figure import plot_figures
+from plot_figure import figure_broken
 
 
 #TODO delete RT2 (11.1 min) in approaches with TBP substrate -> unsure what sis is
@@ -42,18 +42,19 @@ plt.rcParams["font.family"] = "Times New Roman"
 # experiment needs to be the name of the folder containing all sample folders
 # experiments with DD calc for puplication: 20221102 20220919 20220308_practical_course_DBT
 
-experiment = '20230124_2_TBP_Auswertung_5'
-testes_substrate = 'TBP'
-equ_MMw_H2O = 0.2
+experiment = '20220309'
+global tested_substrate
+tested_substrate = 'TeCB'
+equ_MMw_H2O = 0.16
 equ_MMw_D2O = 0.791
 
-if testes_substrate == 'TBP':
+if tested_substrate == 'TBP':
     ion_types = {250: 'DD1', 251: 'DD1', 252: 'DD2', 253: 'DD2'}
     linenums = range(21, 33)      #linenums represents the rows in the text file with related data
-if testes_substrate == 'TCP':
+if tested_substrate == 'TCP':
     ion_types = {162: 'DD1', 163: 'DD1', 164: 'DD2', 165: 'DD2'}
     linenums = range(21, 29)
-if testes_substrate == 'TeCB':
+if tested_substrate == 'TeCB':
     ion_types = {180: 'DD1', 181: 'DD1', 182: 'DD2', 183: 'DD2'}
     linenums = range(21, 25)
 
@@ -127,81 +128,22 @@ RTs = list(map(int, RTs))
 # figure 1, 2, 3: DD1 and DD2 at RT1, RT2, RT3
 # figure 4: DD1 and DD2 average of all RT's
 for MM in condition:
-    for x in RTs:
-        calc_DD1_RT = calc_DD1.loc[(calc_DD1['RT'] == str(x)) & (calc_DD1['Mastermix_with'] == MM)]
-        calc_DD2_RT = calc_DD2.loc[(calc_DD2['RT'] == str(x)) & (calc_DD2['Mastermix_with'] == MM)]
+    for Num_RT in RTs:
+        calc_DD1_RT = calc_DD1.loc[(calc_DD1['RT'] == str(Num_RT)) & (calc_DD1['Mastermix_with'] == MM)]
+        calc_DD2_RT = calc_DD2.loc[(calc_DD2['RT'] == str(Num_RT)) & (calc_DD2['Mastermix_with'] == MM)]
 
-        plot_figure(calc_DD1_RT, calc_DD2_RT, equ_MMw_H2O, equ_MMw_D2O, x, testes_substrate)
-
+        figure_broken(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
         #plt.savefig(pltname + '.svg')
-        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(x)) + MM)
-
+        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(Num_RT)) + MM)
         plt.show()
-
 
     #figure 4: AVG(DD1, DD2)
     calc_MW_DD1 = calc_MW.loc[(calc_MW['ion_type'] == 'DD1') & (calc_MW['Mastermix_with'] == MM)]
     calc_MW_DD2 = calc_MW.loc[(calc_MW['ion_type'] == 'DD2') & (calc_MW['Mastermix_with'] == MM)]
 
-    num_rows = calc_MW_DD1.shape[0]
-
-    x1 = list(calc_MW_DD1.iloc[:, 1])
-    y1 = list(calc_MW_DD1.iloc[:, 3])
-    y1_err = list(calc_MW_DD1.iloc[:, 4])
-    x2 = list(calc_MW_DD2.iloc[:, 1])
-    y2 = list(calc_MW_DD2.iloc[:, 3])
-    y2_err = list(calc_MW_DD2.iloc[:, 4])
-    x3 = list(calc_MW_DD1.iloc[:, 1])
-
-    if MM == "D2O":
-        equilibrium = equ_MMw_D2O
-    elif MM == "H2O":
-        equilibrium = equ_MMw_H2O
-
-    y3 = [equilibrium] * num_rows
-
-    f, (ax, ax2) = plt.subplots(1, 2, sharey=True, facecolor='w', gridspec_kw={'width_ratios': [4, 1]})
-
-    # plot the same data on both axes
-    ax.errorbar(x1, y1, yerr=y1_err, marker='s', alpha=0.7, capsize=3, label='DD1')
-    ax2.errorbar(x1, y1, yerr=y1_err, marker='s', alpha=0.7, capsize=3, label='DD1')
-
-    ax.plot(x1, y3, label='Equilibrium')
-    ax2.plot(x1, y3, label='Equilibrium')
-
-    # hide the spines between ax and ax2
-    ax.spines['right'].set_visible(False)
-    ax2.spines['right'].set_visible(False)
-    ax2.spines['left'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax2.spines['top'].set_visible(False)
-    ax2.yaxis.set_visible(False)
-    ax.yaxis.tick_left()
-    ax.tick_params(axis='y', color='b')
-
-    ax.set_xlim(0, 12)
-    ax2.set_xlim(13, 62)
-
-    d = 0.01  # how big to make the diagonal lines in axes coordinates
-    # arguments to pass plot, just so we don't keep repeating them
-    kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
-    ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)
-    ax.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)
-
-    kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
-    ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)
-    ax2.plot((-d, +d), (-d, +d), **kwargs)
-
-    # Set common labels for the figure
-    f.suptitle((experiment + '\n' + 'DD1, DD2 all RTs ' + '\n' + ' Mastermix w: ' + MM + ', ' + testes_substrate))
-    f.text(0.5, 0.04, 'Time [min]', ha='center', va='center')
-    f.text(0.06, 0.5, 'Deuterium Degree', ha='center', va='center', rotation='vertical')
-    ax.legend(loc="upper left")
-    # f.tight_layout()
-    #pltname = str(experiment + str(x) + MM)
+    figure_broken(calc_MW_DD1, calc_MW_DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, 'all RTs', tested_substrate)
     # plt.savefig(pltname + '.svg')
     plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'MW' + MM ))
-
     plt.show()
 
 
