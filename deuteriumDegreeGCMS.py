@@ -7,6 +7,7 @@ from cleanup import cleanup
 from plot_figure import figure_break
 from plot_zoom import figure_zoom
 from plot_simple import figure_simple
+from adjust_timepoints import adjust_timepoints
 
 
 #TODO delete RT2 (11.1 min) in approaches with TBP substrate -> unsure what sis is
@@ -44,11 +45,11 @@ plt.rcParams["font.family"] = "Times New Roman"
 # experiment needs to be the name of the folder containing all sample folders
 # experiments with DD calc for puplication: 20221102 20220919 20220308_practical_course_DBT
 
-experiment = '20220301_TBP_Auswertung_4'
+experiment = '20230125_E80_TBP_Auswertung_6'
 global tested_substrate
 tested_substrate = 'TBP'
-equ_MMw_H2O = 0.16
-equ_MMw_D2O = 0.791
+equ_MMw_H2O = 0.8
+equ_MMw_D2O = 0.8
 
 if tested_substrate == 'TBP':
     ion_types = {250: 'DD1', 251: 'DD1', 252: 'DD2', 253: 'DD2'}
@@ -95,16 +96,7 @@ for sample in samples:
 results['ion_type'] = results.apply(lambda row: ion_types[row['ion']], axis=1)
 
 # adjust the timepoints to [min] as unit in dataframe
-for i in results.index:
-    time = results.loc[i, 'timepoint_[min]']
-    if time == 'NCC' or time == 'NSC':
-        continue
-    newtime = re.findall('(\d+)', time)[0]
-    unit = re.findall("[a-zA-Z]+", time)[0]
-    if unit == 's' or unit == 'sec':
-        newtime = int(newtime) / 60
-        newtime = ("%.2f" % newtime)                # keep only 2 digits after dot
-    results.loc[i, 'timepoint_[min]'] = float(newtime)
+adjust_timepoints(results)
 
 results = results.loc[(results['timepoint_[min]'] != 'NCC') & (results['timepoint_[min]'] != 'NSC')]
 print(results)
@@ -140,7 +132,11 @@ for MM in condition:
         figure_break(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
         plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment,
                                  str(Num_RT)) + MM + 'break')
-        plt.show()
+        figure_simple(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
+        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment,
+                                 str(Num_RT)) + MM + 'simple')
+
+        #plt.show()
 
     #figure 4: AVG(DD1, DD2)
     calc_MW_DD1 = calc_MW.loc[(calc_MW['ion_type'] == 'DD1') & (calc_MW['Mastermix_with'] == MM)]

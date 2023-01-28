@@ -5,8 +5,8 @@ import os
 import matplotlib.pyplot as plt
 
 # experiment needs to be the name of the folder containing all sample folders
-experiment = '20221102_2_Peakarea_Auswertung_2'
-linenums = [20]
+experiment = '20220301_D2O_H2O_dynamic'
+linenums = [21]     #line 21: with RT 11.53 acetylated compound, line 20 is unacetylated compound
 directory = os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment)
 
 # gives a list with all directories in my target/experiment folder
@@ -38,12 +38,19 @@ for sample in samples:
 condition = pd.unique(results['Mastermix_with'])
 timepoints = pd.unique(results['timepoint_[min]'])
 
+print(results)
+
 calc_results = pd.DataFrame()
 for cond in condition:
     for time in timepoints:
         if time != 'NCC' and time != 'NSC':
             calc = results.loc[(results['Mastermix_with'] == cond) & (results['timepoint_[min]'] == time)]
-            calc_array = (calc['Peak_Area'].to_numpy()).astype(np.int64)
+            print(calc)
+            try:
+                calc_array = (calc['Peak_Area'].to_numpy()).astype(np.int64)
+            except Exception:
+                print(calc)
+            #print(calc_array)
             Std_Peak = np.std(calc_array)
             MW_Peak = np.median(calc_array)
             calc_results = calc_results.append(
