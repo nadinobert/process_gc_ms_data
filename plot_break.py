@@ -1,24 +1,26 @@
 from matplotlib import pyplot as plt
 
-def figure_break(DD1, DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, Num_RT, tested_substrate):
+def figure_break(dataset1, dataset2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, Num_RT, tested_substrate):
 
-    num_rows = DD1.shape[0]
+    num_rows = dataset1.shape[0]
+
+    #to distinguish between the plots for RT1, 2, 3 and all RT's, distinguish bewteen numeric for RT's and is not numeric for all RTs
 
     if Num_RT.isnumeric():
-        x1 = list(DD1.iloc[:, 1])
-        y1 = list(DD1.iloc[:, 4])
-        y1_err = list(DD1.iloc[:, 5])
-        x2 = list(DD2.iloc[:, 1])
-        y2 = list(DD2.iloc[:, 4])
-        y2_err = list(DD2.iloc[:, 5])
+        x1 = list(dataset1.iloc[:, 1])
+        y1 = list(dataset1.iloc[:, 4])
+        y1_err = list(dataset1.iloc[:, 5])
+        x2 = list(dataset2.iloc[:, 1])
+        y2 = list(dataset2.iloc[:, 4])
+        y2_err = list(dataset2.iloc[:, 5])
     else:
-        x1 = list(DD1.iloc[:, 1])
-        y1 = list(DD1.iloc[:, 3])
-        y1_err = list(DD1.iloc[:, 4])
-        x2 = list(DD2.iloc[:, 1])
-        y2 = list(DD2.iloc[:, 3])
-        y2_err = list(DD2.iloc[:, 4])
-        x3 = list(DD1.iloc[:, 1])
+        x1 = list(dataset1.iloc[:, 1])
+        y1 = list(dataset1.iloc[:, 3])
+        y1_err = list(dataset1.iloc[:, 4])
+        x2 = list(dataset2.iloc[:, 1])
+        y2 = list(dataset2.iloc[:, 3])
+        y2_err = list(dataset2.iloc[:, 4])
+        x3 = list(dataset1.iloc[:, 1])
 
     if MM == "D2O":
         equilibrium = equ_MMw_D2O
@@ -30,14 +32,18 @@ def figure_break(DD1, DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, Num_RT, tes
     fig, (ax, ax2) = plt.subplots(1, 2, sharey=True, facecolor='w', gridspec_kw={'width_ratios': [4, 1]})
 
     # plot the same data on both axes
-    ax.errorbar(x1, y1, yerr=y1_err, marker='s', alpha=0.7, capsize=3, label='DD1')
-    ax2.errorbar(x1, y1, yerr=y1_err, marker='s', alpha=0.7, capsize=3, label='DD1')
+    ax.errorbar(x1, y1, yerr=y1_err, marker='', capsize=3, capthick=0.5, ls='-', color='black', linewidth=0.5)  # plot the errorbar
+    ax.plot(x1, y1, linewidth=0.6, color='blue')  # plot the simple line
+    ax.scatter(x1, y1, marker='s', alpha=0.7, label='DD', color='blue')  # plot the datapoint dots
+    ax2.errorbar(x1, y1, yerr=y1_err, marker='', capsize=3, capthick=0.5, ls='-', color='black', linewidth=0.5)  # plot the errorbar
+    ax2.plot(x1, y1, linewidth=0.6, color='blue')  # plot the simple line
+    ax2.scatter(x1, y1, marker='s', alpha=0.7, label='DD', color='blue')  # plot the datapoint dots
 
     #ax.errorbar(x2, y2, yerr=y2_err, marker='s', alpha=0.7, capsize=3, label='DD2')
     #ax2.errorbar(x2, y2, yerr=y2_err, marker='s', alpha=0.7, capsize=3, label='DD2')
 
-    ax.plot(x1, y3, label='Equilibrium', color='grey')
-    ax2.plot(x1, y3, label='Equilibrium', color='grey')
+    ax.plot(x1, y3, label='Equilibrium', color='green', linewidth=0.7, linestyle='--')
+    ax2.plot(x1, y3, label='Equilibrium', color='green', linewidth=0.7, linestyle='--')
 
     # hide the spines between ax and ax2
     ax.spines['right'].set_visible(False)

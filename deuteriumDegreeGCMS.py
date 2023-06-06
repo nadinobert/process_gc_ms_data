@@ -4,7 +4,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from cleanup import cleanup
-from plot_figure import figure_break
+from plot_break import figure_break
 from plot_zoom import figure_zoom
 from plot_simple import figure_simple
 from adjust_timepoints import adjust_timepoints
@@ -39,16 +39,14 @@ def extract_peakarea(line, sample):
     return (ion, RT, peakarea)
 
 
-# set font globally to times new roman
+# set font globally to 'times new roman'
 plt.rcParams["font.family"] = "Times New Roman"
 
 # experiment needs to be the name of the folder containing all sample folders
-# experiments with DD calc for puplication: 20221102 20220919 20220308_practical_course_DBT
-
-experiment = '20230125_E80_TBP_Auswertung_6'
+experiment = '20220302'
 global tested_substrate
-tested_substrate = 'TBP'
-equ_MMw_H2O = 0.8
+tested_substrate = 'TeCB'
+equ_MMw_H2O = 0.16
 equ_MMw_D2O = 0.8
 
 if tested_substrate == 'TBP':
@@ -98,8 +96,8 @@ results['ion_type'] = results.apply(lambda row: ion_types[row['ion']], axis=1)
 # adjust the timepoints to [min] as unit in dataframe
 adjust_timepoints(results)
 
+#get rid of all dump control samples
 results = results.loc[(results['timepoint_[min]'] != 'NCC') & (results['timepoint_[min]'] != 'NSC')]
-print(results)
 
 #calc df contains data for fiure 1, 2 and 3 (Single figures for each RT)
 #calc2 df contains data for figure 4 (Average of all RTs)
@@ -120,14 +118,14 @@ RTs = list(map(int, RTs))
 # plot data
 # for every MM approach
 # figure 1, 2, 3: DD1 and DD2 at RT1, RT2, RT3
-# figure 4: DD1 and DD2 average of all RT's
+# figure 4: Average of all RT's
 for MM in condition:
     for Num_RT in RTs:
         calc_DD1_RT = calc_DD1.loc[(calc_DD1['RT'] == str(Num_RT)) & (calc_DD1['Mastermix_with'] == MM)]
         calc_DD2_RT = calc_DD2.loc[(calc_DD2['RT'] == str(Num_RT)) & (calc_DD2['Mastermix_with'] == MM)]
 
         figure_zoom(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
-        #plt.savefig(pltname + '.svg')
+        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment + str(Num_RT)) + tested_substrate + MM +'zoom' + '.svg')
         plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(Num_RT)) + MM + 'zoom')
         figure_break(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
         plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment,
@@ -135,15 +133,15 @@ for MM in condition:
         figure_simple(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
         plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment,
                                  str(Num_RT)) + MM + 'simple')
+        #plt.savefig('zoomi' + MM + '.svg')
 
-        #plt.show()
+        plt.show()
 
     #figure 4: AVG(DD1, DD2)
     calc_MW_DD1 = calc_MW.loc[(calc_MW['ion_type'] == 'DD1') & (calc_MW['Mastermix_with'] == MM)]
     calc_MW_DD2 = calc_MW.loc[(calc_MW['ion_type'] == 'DD2') & (calc_MW['Mastermix_with'] == MM)]
 
     figure_break(calc_MW_DD1, calc_MW_DD2, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, 'all RTs', tested_substrate)
-    # plt.savefig(pltname + '.svg')
     plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'MW' + MM ))
     plt.show()
 
