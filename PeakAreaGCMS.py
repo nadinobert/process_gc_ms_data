@@ -14,7 +14,7 @@ from adjust_timepoints import adjust_timepoints
 np.set_printoptions(precision=10)
 
 # experiment needs to be the name of the folder containing all sample folders
-experiment = '20230613_E80_peakarea'
+experiment = '20230711_calibration'
 line_DBP_TBP = [20, 23]     #line 22: with RT 11.55 acetylated DBP, line 20, 21 is unacetylated DBP
 Init_Substrate_conc = 210           # initiale substrate concentration in µM
 directory = os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment)

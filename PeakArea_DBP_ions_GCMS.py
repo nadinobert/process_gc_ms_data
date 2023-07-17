@@ -1,10 +1,9 @@
-# This code calculates the peak area of the main ions belonging to TBP -> Target ion at certain RT's
-# ions: 328-335
+# This code calculates the peak area of the main ions belonging to DBP -> Target ion at certain RT's
+# ions: 250-254
 # at 3 different retention times (or 2 RTs -> set RT2 to zero in the method to skip the third peak)
-# the input data file has 24 lines (20-44) with ions and their respoonses
-# 1) calc the sum of all ion peaks belonging to TBP in NCC -> calc the mean value over all replicates
-# 2) calc the sum of all ion peaks belonging to TBP in each sample -> calc the mean of the peak areas over all replicates
-# 3) compare the mean peak area value with NCC to calc remaining substrate
+# the input data file has 15 lines (20-35) with ions and their respoonses
+# 1) calc the sum of all ion peaks belonging to DBP in every sample per RT -> calc the mean value over all replicates
+# 2) calc the concentration Response/ Peakarea according to calibration 20230711
 
 import re
 import pandas as pd
@@ -34,9 +33,8 @@ def plotshit(x1, y1, y1error, pltname, yaxis, condition):
 np.set_printoptions(precision=10)
 
 # experiment needs to be the name of the folder containing all sample folders
-experiment = '20230613_E20_TBP_con'
-line_TBP_ion = [x for x in range(20, 44)]     #line 20 till 44 ion peak data belonging to TBP for every ion at every RT use: range(20, 44), 36 till 43 belongs to acetylated peak to consider only acetylated TBP peak use: range(36, 44)
-Init_Substrate_conc = 210           # initiale substrate concentration in µM
+experiment = '20230711_E80'
+line_DBP_ion = [x for x in range(31, 36)]     #line 20 till 36 ion peak data belonging to DBP for every ion at every RT
 directory = os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment)
 
 # set font globally to 'times new roman'
@@ -57,7 +55,7 @@ for sample in samples:
                 if filename == 'epatemp.txt':
                     data = open(os.path.join(directory, sample, 'epatemp.txt'))
                     for i, ln in enumerate(data):
-                        if i in line_TBP_ion:
+                        if i in line_DBP_ion:
                             new = ln.split(" ")
                             try:
                                 RT_No = (list(filter(lambda x: x != '', new))[1]).split('_')[2]
@@ -72,50 +70,38 @@ for sample in samples:
 # adjust the timepoints to [min] as unit in dataframe
 adjust_timepoints(results)
 
-
 #delete all entries with RT=0
 results['Peak_Area'] = pd.to_numeric(results['Peak_Area'], errors='coerce')
 results = results.dropna()
-#Extract NCC value for calculation
-NCC_TBP_df = results.loc[(results['timepoint_[min]'] == 'NCC')]
-NCC_TBP_df = NCC_TBP_df.groupby(['Mastermix_with', 'timepoint_[min]', 'replicate']).agg({'Peak_Area': ['sum']})
-NCC_TBP_df = NCC_TBP_df.reset_index()
-NCC_TBP_df.columns = ['Mastermix_with', 'timepoint_[min]', 'replicate', 'Peak_Area_sum']
-NCC_TBP_mean = NCC_TBP_df['Peak_Area_sum'].mean()
-#get rid of all dump control samples NCC and NSC lol
-results = results.loc[(results['timepoint_[min]'] != 'NCC') & (results['timepoint_[min]'] != 'NSC')]
 
-#print(NCC_TBP_mean)
-#print(results)
+print(results)
 
 results.dropna(inplace=True, how='any')
 
-#calc the sum of all TBP ion peak in each repl
-calc_TBP = results.groupby(['Mastermix_with', 'timepoint_[min]', 'replicate']).agg({'Peak_Area': ['sum']})
-calc_TBP = cleanup(calc_TBP)
-calc_TBP.columns = ['Mastermix_with', 'timepoint_[min]', 'replicate', 'Peak_Area_sum']
+#calc the sum of all DBP ion peak in each repl
+calc_DBP = results.groupby(['Mastermix_with', 'timepoint_[min]', 'replicate']).agg({'Peak_Area': ['sum']})
+calc_DBP = cleanup(calc_DBP)
+calc_DBP.columns = ['Mastermix_with', 'timepoint_[min]', 'replicate', 'Peak_Area_sum']
 
-#calc the mean of all TBP ion peak per timepoint
-calc_TBP = calc_TBP.groupby(['Mastermix_with', 'timepoint_[min]']).agg({'Peak_Area_sum': ['mean', 'std']})
-calc_TBP = cleanup(calc_TBP)
-print(calc_TBP)
-calc_TBP.columns = ['Mastermix_with', 'timepoint_[min]', 'Peak_Area_mean', 'Peak_Area_std']
-print(calc_TBP)
+#calc the mean of all DBP ion peak per timepoint
+calc_DBP = calc_DBP.groupby(['Mastermix_with', 'timepoint_[min]']).agg({'Peak_Area_sum': ['mean', 'std']})
+calc_DBP = cleanup(calc_DBP)
+print(calc_DBP)
+calc_DBP.columns = ['Mastermix_with', 'timepoint_[min]', 'Peak_Area_mean', 'Peak_Area_std']
+print(calc_DBP)
 
-#calc the remaining TBP concentration according to the initial TBP concentration
-calc_TBP['TBP_[µM]'] = (calc_TBP['Peak_Area_mean'] / NCC_TBP_mean) * Init_Substrate_conc
-calc_TBP['TBP_[µM]_Std'] = (calc_TBP['Peak_Area_std'] / NCC_TBP_mean) * Init_Substrate_conc
+#calc concentration according to calibration
+calc_DBP['DBP_[µM]'] = (calc_DBP['Peak_Area_mean'] / 34190)
+calc_DBP['DBP_[µM]_Std'] = (calc_DBP['Peak_Area_std'] / 34190)
 
-print(calc_TBP)
-
-x1 = np.array(calc_TBP['timepoint_[min]'].values)
-y1 = np.array(calc_TBP['TBP_[µM]'].values)
-y1error = np.array(calc_TBP['TBP_[µM]_Std'].values)
+x1 = np.array(calc_DBP['timepoint_[min]'].values)
+y1 = np.array(calc_DBP['DBP_[µM]'].values)
+y1error = np.array(calc_DBP['DBP_[µM]_Std'].values)
 
 condition = pd.unique(results['Mastermix_with'])
 
 for cond in condition:
-    plotshit(x1, y1, y1error, 'Remaining TBP [µM]]', 'Concentration [µM]', condition)
+    plotshit(x1, y1, y1error, 'Produced DBP [µM]]', 'Concentration [µM]', condition)
     #plt.savefig('simple' + '_D2O_H2O_product_amount' + '.svg')
     plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'Remaining_TBP'))
     #calc_results_DBP.to_csv(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'Formed product, MM with H2O'), index=False)
