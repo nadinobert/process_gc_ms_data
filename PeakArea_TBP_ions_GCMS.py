@@ -1,11 +1,10 @@
 # This code calculates the peak area of the main ions belonging to TBP -> Target ion at certain RT's
 # ions: 328-335
-#at 3 different retention times
+# at 3 different retention times (or 2 RTs -> set RT2 to zero in the method to skip the third peak)
 # the input data file has 24 lines (20-44) with ions and their respoonses
 # 1) calc the sum of all ion peaks belonging to TBP in NCC -> calc the mean value over all replicates
 # 2) calc the sum of all ion peaks belonging to TBP in each sample -> calc the mean of the peak areas over all replicates
 # 3) compare the mean peak area value with NCC to calc remaining substrate
-
 
 import re
 import pandas as pd
@@ -14,7 +13,6 @@ import os
 import matplotlib.pyplot as plt
 from adjust_timepoints import adjust_timepoints
 from cleanup import cleanup
-
 
 # time to plot figure 1 with DBP concentrations
 def plotshit(x1, y1, y1error, pltname, yaxis, condition):
@@ -33,12 +31,11 @@ def plotshit(x1, y1, y1error, pltname, yaxis, condition):
     plt.legend(loc="upper left")
     plt.tight_layout()
 
-
 np.set_printoptions(precision=10)
 
 # experiment needs to be the name of the folder containing all sample folders
-experiment = '20220919_conc_3'
-line_TBP_ion = [x for x in range(36, 44)]     #line 20 till 44 containing ion peak data belonging to TBP, 36 till 43 belongs to acetylated peak
+experiment = '20230613_E20_TBP_con'
+line_TBP_ion = [x for x in range(20, 44)]     #line 20 till 44 ion peak data belonging to TBP for every ion at every RT use: range(20, 44), 36 till 43 belongs to acetylated peak to consider only acetylated TBP peak use: range(36, 44)
 Init_Substrate_conc = 210           # initiale substrate concentration in µM
 directory = os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment)
 
@@ -121,6 +118,7 @@ condition = pd.unique(results['Mastermix_with'])
 for cond in condition:
     plotshit(x1, y1, y1error, 'Remaining TBP [µM]]', 'Concentration [µM]', condition)
     #plt.savefig('simple' + '_D2O_H2O_product_amount' + '.svg')
+    plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'Remaining_TBP'))
     #calc_results_DBP.to_csv(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'Formed product, MM with H2O'), index=False)
     #plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, 'Produced_DBP'))
     plt.show()

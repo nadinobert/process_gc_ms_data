@@ -43,15 +43,16 @@ def extract_peakarea(line, sample):
 plt.rcParams["font.family"] = "Times New Roman"
 
 # experiment needs to be the name of the folder containing all sample folders
-experiment = '20220302'
+experiment = '20230711_E20'
 global tested_substrate
-tested_substrate = 'TeCB'
-equ_MMw_H2O = 0.16
-equ_MMw_D2O = 0.8
+tested_substrate = 'TBP'
+equ_MMw_H2O = 0.2
+equ_MMw_D2O = 0.2
 
 if tested_substrate == 'TBP':
     ion_types = {250: 'DD1', 251: 'DD1', 252: 'DD2', 253: 'DD2'}
-    linenums = range(21, 33)      #linenums represents the rows in the text file with related data
+    #linenums = range(21, 33)    #linenums represents the rows in the text file with related data
+    linenums = list(range(21, 25)) + list(range(26, 30)) + list(range(31, 35))      #adjusted for new evaluation method considering ion 251-254 for quantification
 if tested_substrate == 'TCP':
     ion_types = {162: 'DD1', 163: 'DD1', 164: 'DD2', 165: 'DD2'}
     linenums = range(21, 29)
@@ -125,15 +126,12 @@ for MM in condition:
         calc_DD2_RT = calc_DD2.loc[(calc_DD2['RT'] == str(Num_RT)) & (calc_DD2['Mastermix_with'] == MM)]
 
         figure_zoom(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
-        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment + str(Num_RT)) + tested_substrate + MM +'zoom' + '.svg')
+        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(Num_RT)) + MM +'zoom' + '.svg')
         plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(Num_RT)) + MM + 'zoom')
         figure_break(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
-        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment,
-                                 str(Num_RT)) + MM + 'break')
+        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(Num_RT)) + MM + 'break')
         figure_simple(calc_DD1_RT, calc_DD2_RT, MM, equ_MMw_H2O, equ_MMw_D2O, experiment, str(Num_RT), tested_substrate)
-        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment,
-                                 str(Num_RT)) + MM + 'simple')
-        #plt.savefig('zoomi' + MM + '.svg')
+        plt.savefig(os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment, str(Num_RT)) + MM + 'simple')
 
         plt.show()
 

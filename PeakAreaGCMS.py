@@ -1,7 +1,8 @@
 # Calculations based on TIC at certain RT's
+# this code is for TIC (peak area at specific time points)
 # This code calculates the peak area and the corresponding DBP concentration per time point according to a calibration. Considered is only acetlyated product!
 # The code can also determine the consumed substrate per timepoint by substracting the amount of remaining product compared to NCC
-#the input datafile has 6 lines : DPB at RT1,2,3 (line 20,21,22) and TBP at RT1,2,3 (line 23,24,25)
+# The input datafile has 6 lines: DPB at RT1,2,3 (line 20,21,22) and TBP at RT1,2,3 (line 23,24,25)
 
 import re
 import pandas as pd
@@ -13,8 +14,8 @@ from adjust_timepoints import adjust_timepoints
 np.set_printoptions(precision=10)
 
 # experiment needs to be the name of the folder containing all sample folders
-experiment = '20230125_E80_conc_2'
-line_DBP_TBP = [22, 25]     #line 22: with RT 11.55 acetylated DBP, line 20, 21 is unacetylated DBP
+experiment = '20230613_E80_peakarea'
+line_DBP_TBP = [20, 23]     #line 22: with RT 11.55 acetylated DBP, line 20, 21 is unacetylated DBP
 Init_Substrate_conc = 210           # initiale substrate concentration in µM
 directory = os.path.join(r'C:\Users\hellmold\Nextcloud\Experiments\Activity_Assay_GC_MS', experiment)
 
@@ -41,7 +42,7 @@ for sample in samples:
                             ion = (list(filter(lambda x: x != '', new))[1]).split('_')[1]
                             peakarea = (list(filter(lambda x: x != '', new))[4])
                             RT = (list(filter(lambda x: x != '', new))[2])
-                            if i == 22:
+                            if i == 22 or i == 21 or i == 20:
                                 substance = 'DBP'
                             else:
                                 substance = 'TBP'
